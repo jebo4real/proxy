@@ -1,10 +1,10 @@
 # Reverse proxy: route by subdomain to web-client or web-admin (HTTP only)
 # Set CLIENT_DOMAIN and ADMIN_DOMAIN (e.g. app.example.com, admin.example.com)
 
-# Client subdomain -> web-client
+# Client (and default for IP/hostname) -> web-client
 server {
-    listen 80;
-    server_name ${CLIENT_DOMAIN};
+    listen 80 default_server;
+    server_name ${CLIENT_DOMAIN} _;
 
     location / {
         proxy_pass http://web-client:80;

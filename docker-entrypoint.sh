@@ -18,11 +18,18 @@ if [ "$SSL_ENABLED" = "true" ]; then
         echo "Generating self-signed certificate for $CLIENT_DOMAIN and $ADMIN_DOMAIN..."
         if touch /etc/nginx/ssl/.write-test 2>/dev/null; then
             rm -f /etc/nginx/ssl/.write-test
-            SAN="DNS:$CLIENT_DOMAIN,DNS:$ADMIN_DOMAIN,DNS:localhost,IP:127.0.0.1"
+            # SAN: each space-separated CLIENT_DOMAIN and ADMIN_DOMAIN as DNS:, plus localhost and 127.0.0.1
+            SAN=""
+            for d in $CLIENT_DOMAIN $ADMIN_DOMAIN; do
+                [ -n "$d" ] && SAN="${SAN}DNS:${d},"
+            done
+            SAN="${SAN}DNS:localhost,IP:127.0.0.1"
+            CN=$(echo "$CLIENT_DOMAIN" | awk '{print $1}')
+            [ -z "$CN" ] && CN="localhost"
             openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
                 -keyout /etc/nginx/ssl/key.pem \
                 -out /etc/nginx/ssl/cert.pem \
-                -subj "/CN=$CLIENT_DOMAIN/O=EndPlan/C=US" \
+                -subj "/CN=${CN}/O=EndPlan/C=US" \
                 -addext "subjectAltName=$SAN"
             echo "Self-signed certificate created."
         else

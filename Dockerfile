@@ -4,6 +4,7 @@ RUN apk add --no-cache curl openssl gettext
 
 RUN mkdir -p /etc/nginx/ssl /etc/nginx/templates
 
+COPY nginx-main.conf /etc/nginx/nginx.conf
 COPY nginx.conf.template /etc/nginx/templates/
 COPY nginx-ssl.conf.template /etc/nginx/templates/
 
